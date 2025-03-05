@@ -231,9 +231,9 @@ const assignLeads = async (agentId, numberOfLeads, projectId) => {
     handleError("Failed to assign leads. Please try again.", error);
   } finally {
     setTimeout(() => toggleLoading(false), 300);
-    elements.submitBtn.disabled = true;
-    elements.submitBtn.classList.add("opacity-50");
-    elements.submitBtn.textContent = "Assigning...";
+    elements.submitBtn.disabled = false;
+    elements.submitBtn.classList.remove("opacity-50");
+    elements.submitBtn.textContent = "Submit";
   }
 };
 
