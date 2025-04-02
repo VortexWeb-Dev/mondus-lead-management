@@ -22,27 +22,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
                 fclose($handle);
 
                 $fieldMapping = [
-                    "source" => "ufCrm6Source",
-                    "lead_name" => "ufCrm6LeadName",
-                    "phone" => "ufCrm6Phone",
-                    "project_building" => "ufCrm6ProjectOrBuilding",
-                    "type" => "ufCrm6Type",
-                    "unit_no" => "ufCrm6UnitNo",
-                    "size" => "ufCrm6Size",
-                    "area_name" => "ufCrm6AreaName",
-                    "buyer_seller" => "ufCrm6BuyerOrSeller",
-                    "building_name_2" => "ufCrm_6_BUILDING_NAME_2",
-                    "rooms" => "ufCrm6Rooms",
-                    "bathrooms" => "ufCrm6Bathrooms",
-                    "parking" => "ufCrm6Parking",
-                    "furnished" => "ufCrm6Furnished",
-                    "master_project" => "ufCrm6MasterProject",
-                    "view" => "ufCrm6View",
+                    "source" => "ufCrm4Source",
+                    "lead_name" => "ufCrm4LeadName",
+                    "phone" => "ufCrm4Phone",
+                    "project_building" => "ufCrm4ProjectOrBuilding",
+                    "type" => "ufCrm4Type",
+                    "unit_no" => "ufCrm4UnitNo",
+                    "size" => "ufCrm4Size",
+                    "area_name" => "ufCrm4AreaName",
+                    "buyer_seller" => "ufCrm4BuyerOrSeller",
+                    "building_name_2" => "ufCrm_4_BUILDING_NAME_2",
+                    "rooms" => "ufCrm4Rooms",
+                    "bathrooms" => "ufCrm4Bathrooms",
+                    "parking" => "ufCrm4Parking",
+                    "furnished" => "ufCrm4Furnished",
+                    "master_project" => "ufCrm4MasterProject",
+                    "view" => "ufCrm4View",
                 ];
 
                 foreach ($data as $row) {
                     $itemFields = [
-                        'entityTypeId' => 1046,
+                        'entityTypeId' => 1040,
                         'fields' => []
                     ];
 
