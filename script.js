@@ -280,6 +280,7 @@ const migrateToLeads = async (leads, agentId) => {
           UF_CRM_1746093173984: item.ufCrm4MasterProject,
           UF_CRM_1746093180615: item.ufCrm4View,
           ASSIGNED_BY_ID: agentId,
+          STAGE_ID: "IN_PROCESS"
         };
 
         // Create lead
