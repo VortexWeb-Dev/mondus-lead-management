@@ -6,6 +6,8 @@ const endpoints = {
   projects: `${API_BASE_URL}/crm.item.list?entityTypeId=${entityTypeId}&select[0]=ID&select[1]=ufCrm4ProjectOrBuilding`,
   agents: `${API_BASE_URL}/user.get?filter[ACTIVE]=Y&filter[!=ID]=1`,
   leads: `${API_BASE_URL}/crm.item.list?entityTypeId=${entityTypeId}&select[0]=ID&select[1]=assignedById&select[2]=ufCrm4ProjectOrBuilding`,
+  getLead: `${API_BASE_URL}/crm.item.get?entityTypeId=${entityTypeId}`,
+  addLead: `${API_BASE_URL}/crm.lead.add`, // Bitrix Lead
   updateLead: `${API_BASE_URL}/crm.item.update?entityTypeId=${entityTypeId}`,
 };
 
@@ -225,6 +227,7 @@ const assignLeads = async (agentId, numberOfLeads, projectId) => {
       })
     );
 
+    await migrateToLeads(leadsToAssign, agentId);
     await fetchLeadsForProject(projectId);
     showToast("Leads assigned successfully!", "success");
   } catch (error) {
@@ -234,6 +237,64 @@ const assignLeads = async (agentId, numberOfLeads, projectId) => {
     elements.submitBtn.disabled = false;
     elements.submitBtn.classList.remove("opacity-50");
     elements.submitBtn.textContent = "Submit";
+  }
+};
+
+const migrateToLeads = async (leads, agentId) => {
+  if (!leads.length || !agentId) return;
+
+  try {
+    await Promise.all(
+      leads.map(async (lead) => {
+        const itemId = lead.id;
+        // Fetch the item to get all fields
+        const itemResponse = await fetch(`${endpoints.getLead}&id=${itemId}`);
+        const itemJson = await itemResponse.json();
+
+        if (itemJson.error)
+          throw new Error(`Failed to fetch lead ${lead.id}: ${itemJson.error}`);
+
+        const item = itemJson.result.item;
+
+        // Populate fields for creating lead
+        const leadFields = {
+          TITLE: item.ufCrm4LeadName,
+          SOURCE_DESCRIPTION: item.ufCrm4Source,
+          PHONE: [
+            {
+              VALUE: item.ufCrm4Phone,
+              VALUE_TYPE: "WORK",
+            },
+          ],
+          UF_CRM_67EF89CF93134: item.ufCrm4ProjectOrBuilding,
+          UF_CRM_1746093109064: item.ufCrm4Type,
+          UF_CRM_1744802167754: item.ufCrm4UnitNo,
+          UF_CRM_1746093122757: item.ufCrm4Size,
+          UF_CRM_67EF89CF9C223: item.ufCrm4AreaName,
+          UF_CRM_1746093140292: item.ufCrm4BuyerOrSeller,
+          UF_CRM_1746093152879: item.ufCrm_4_BUILDING_NAME_2,
+          UF_CRM_67EF89CFA375A: item.ufCrm4Rooms,
+          UF_CRM_67EF89CFA94EC: item.ufCrm4Bathrooms,
+          UF_CRM_67EF89CFAF8D6: item.ufCrm4Parking,
+          UF_CRM_1746093165755: item.ufCrm4Furnished,
+          UF_CRM_1746093173984: item.ufCrm4MasterProject,
+          UF_CRM_1746093180615: item.ufCrm4View,
+          ASSIGNED_BY_ID: agentId,
+        };
+
+        // Create lead
+        const leadResponse = await fetch(endpoints.addLead, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fields: leadFields }),
+        });
+        const leadJson = await leadResponse.json();
+        if (leadJson.error)
+          throw new Error(`Failed to create lead: ${leadJson.error}`);
+      })
+    );
+  } catch (error) {
+    handleError("Failed to migrate leads. Please try again.", error);
   }
 };
 
